@@ -45,14 +45,6 @@ public class ListFragment extends Fragment implements VideosListListener {
         mViewModel = new VideosListViewModel(this, context);
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (mViewModel != null) {
-            mViewModel.onCreate();
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -81,6 +73,7 @@ public class ListFragment extends Fragment implements VideosListListener {
                 String searchQuery = mSearchEditText.getText().toString();
                 if (searchQuery.trim().length() > 0) {
                     if (mViewModel != null) {
+                        mSearchButton.setEnabled(false);
                         mAdapter.clearList();
                         mShowProgressBar = true;
                         mProgressBar.setVisibility(View.VISIBLE);
@@ -103,6 +96,7 @@ public class ListFragment extends Fragment implements VideosListListener {
     private void checkAlreadyExistingData() {
         mSearchEditText.setText(mViewModel.getCurrentSearchQuery());
         if (mShowProgressBar) {
+            mSearchButton.setEnabled(false);
             mProgressBar.setVisibility(View.VISIBLE);
         }
     }
@@ -124,15 +118,8 @@ public class ListFragment extends Fragment implements VideosListListener {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mViewModel != null) {
-            mViewModel.onDestroy();
-        }
-    }
-
-    @Override
     public void onListReady(List<Video> videos) {
+        mSearchButton.setEnabled(true);
         mProgressBar.setVisibility(View.GONE);
         mShowProgressBar = false;
         mAdapter.updateAdapter(videos);
@@ -140,6 +127,7 @@ public class ListFragment extends Fragment implements VideosListListener {
 
     @Override
     public void onError(String message) {
+        mSearchButton.setEnabled(true);
         mProgressBar.setVisibility(View.GONE);
         mShowProgressBar = false;
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
